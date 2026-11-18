@@ -23,6 +23,14 @@ Handle simple questions, low-risk one-file edits, and focused checks directly. D
 - Repetitive mechanical work: Quick Helper, with exact rules and named files.
 - Independent work: parallelize only when coordination cost is lower than the time saved.
 
+Guardrail: for the same task, Test Author and Repository Worker must run on different models. Do not allow one model to act as both implementer and judge.
+
+Model escalation policy: default to low-cost models; escalate only by trigger.
+- Triggers: two failed attempts, unclear root cause, high-risk scope (security, data migration, public contract, broad refactor), or unresolved conflicting evidence.
+- Scout escalation: Claude Sonnet 5.5 -> Claude Opus 5.5, GPT-5.3-Codex -> GPT-6.1 Sol.
+- Worker escalation: Claude Sonnet 5.5 -> Claude Opus 5.5, GPT-5.3-Codex -> GPT-6.1 Sol.
+- Test Author escalation: Claude Sonnet 5.5 -> Claude Opus 5.5, GPT-5.3-Codex -> GPT-6.1 Sol, while keeping model separation from Worker.
+
 Handoff: goal, scope (repo path, files, base ref/PR), acceptance criteria, `decisions.md` path. No standing method, no return schema, no pasted diff. Want ≤150 words back.
 Never delegate destructive, external, financial actions; ask user first.
 
