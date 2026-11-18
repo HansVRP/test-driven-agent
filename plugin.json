@@ -1,0 +1,21 @@
+{
+  "name": "test-driven-agent",
+  "description": "Risk-based coding workflow for VS Code Copilot: concise plans, focused tests, and selective delegation and review.",
+  "version": "1.0.0",
+  "author": {
+    "name": "HansVanrompay"
+  },
+  "license": "MIT",
+  "keywords": [
+    "test-driven-agent",
+    "tdd",
+    "delegation",
+    "subagent",
+    "context-engineering",
+    "ponytail",
+    "minimal-change"
+  ],
+  "agents": ["./agents"],
+  "skills": ["./skills"],
+  "hooks": "./hooks.json"
+}
