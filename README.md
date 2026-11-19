@@ -6,11 +6,11 @@ Risk-based development plugin for VS Code Copilot. Routine tasks take a direct, 
 
 | Agent | Models | Tools | Role |
 | --- | --- | --- | --- |
-| Test Driven Agent (lead) | Claude Opus 5.5 -> GPT-6.1 Sol | Ask, memory, skills, read, edit, delegate | Plans with the user, delegates, decides, checks |
-| Research Scout | Claude Sonnet 5.5 -> GPT-5.3-Codex (escalation: Sonnet->Opus, Codex->Sol) | All (read-only by instruction) | Web research via built-in search and fetch, repository maps |
-| Repository Worker | GPT-5.3-Codex -> Claude Sonnet 5.5 (escalation: Codex->Sol, Sonnet->Opus) | All | Named-file edits, builds, tests, scripts |
-| Quality Gate | GPT-6.1 Sol -> Claude Opus 5.5 | Read, search, shell, skills | Independent correctness, security, minimality review |
-| Test Author | Claude Sonnet 5.5 -> GPT-5.3-Codex (escalation: Sonnet->Opus, Codex->Sol) | Read, search, edit, shell, skills | Writes failing behavior tests from spec + current code/tests, before implementation |
+| Test Driven Agent (lead) | Claude Opus 5.5 | Ask, memory, skills, read, edit, delegate | Plans with the user, delegates, decides, checks |
+| Research Scout | Claude Sonnet 5.5 (escalation: Claude Opus 5.5) | All (read-only by instruction) | Web research via built-in search and fetch, repository maps |
+| Repository Worker | GPT only: GPT-5.3-Codex (escalation: GPT-6.1 Sol) | All | Named-file edits, builds, tests, scripts |
+| Quality Gate | Per task: Claude Sonnet 5.5 (routine), Claude Opus 5.5 or GPT-6.1 Sol (high-risk); never the implementer's or Test Author's model | Read, search, shell, skills | Independent correctness, security, minimality review |
+| Test Author | Claude only: Claude Sonnet 5.5 (escalation: Claude Opus 5.5) | Read, search, edit, shell, skills | Writes failing behavior tests from spec + current code/tests, before implementation |
 | Quick Helper | Claude Haiku 5.5 | Read, search, edit, shell | Fully specified repetitive work |
 
 Scout and Worker get every tool, so MCP servers you add are available to them in new sessions.
@@ -22,7 +22,7 @@ Scout and Worker get every tool, so MCP servers you add are available to them in
 - **Delegation:** delegate external facts, broad discovery, noisy output, multi-file edits, and independent review when isolation or parallelism is worth its overhead. Give named scope and acceptance criteria; subagents return capped summaries, never transcripts.
 - **Review loop:** explicit review requests and high-risk changes go to Quality Gate; use Research Scout first for unknown repos. Split large reviews only across independent areas. Worker validates delegated changes; allow one focused repair and re-review, then escalate unresolved findings.
 - **High-risk TDD:** when independent assurance is useful, the Test Author derives scenarios and failing behavior tests from the settled spec, without seeing implementation changes. Tests are protected from implementation edits. Mutation checks are reserved for critical risks where a survivor would matter. See `behavior-tests` and `delegated-delivery` for detailed criteria.
-- **Model separation guardrail:** Test Author and Repository Worker must run on different models for the same task, so one model is never both implementer and judge.
+- **Model separation guardrail:** Test Author is Claude-only and Repository Worker is GPT-only, so they can never share a model, even after escalation. The lead sets Quality Gate's model per task to one not used by the implementer or Test Author: Sonnet for routine reviews, Opus (or Sol if Opus was used) for high-risk.
 - **Escalation guardrail:** default to low-cost models; escalate only when complexity/risk triggers hit (repeated failed attempts, unclear root cause, high-risk scope, or conflicting evidence). Escalation mapping is Sonnet->Opus and Codex->Sol.
 - **Plans and progress:** every non-trivial task starts with a numbered plan and matching todos. Routine work uses a short plan; high-risk work uses the eight-step plan. Follow the plan and explain any replan; avoid repetitive status narration.
 - **Lean output:** instructions and answers are written caveman-style; no other progress narration or check-ins, final answer ≤8 lines. Negations, conditions, and uncertainty are kept.
@@ -54,4 +54,4 @@ Built for the Copilot harness; the Local harness still works, without output rep
 
 Web research uses the harness's built-in web search and fetch tools; no MCP server or API key is needed.
 
-**Model/context:** use the smallest available context that fits the task; increase it only when the work needs more repository or conversation history. The lead model list puts Claude Opus 5.5 first, with GPT-6.1 Sol as the fallback.
+**Model/context:** use the smallest available context that fits the task; increase it only when the work needs more repository or conversation history. Assumes access to both Claude and GPT models; there are no cross-vendor fallbacks.
