@@ -2,7 +2,7 @@
 description: "Research and repository reconnaissance subagent. Use for external research, large-repository scanning, unknown ownership, noisy logs, and evidence maps."
 name: "Research Scout"
 model: ["Claude Sonnet 5.5 (copilot)"]
-tools: ["*"]
+tools: [read, search, web, web_fetch, web_search, skill]
 reasoning-effort: medium
 user-invocable: false
 ---
